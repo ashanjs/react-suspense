@@ -26,7 +26,11 @@ function PokemonInfo({ pokemonResource }) {
 // 🐨 create a SUSPENSE_CONFIG variable right here and configure timeoutMs to
 // whatever feels right to you, then try it out and tweek it until you're happy
 // with the experience.
-const SUSPENSE_CONFIG = { timeoutMs: 4000 }
+const SUSPENSE_CONFIG = {
+  timeoutMs: 4000,
+  busyDelayMs: 300,
+  busyMinDurationMs: 700
+}
 function createPokemonResource(pokemonName) {
   // 🦉 once you've finished the exercise, play around with the delay...
   // the second parameter to fetchPokemon is a delay so you can play around
@@ -81,7 +85,7 @@ function App() {
       <React.Suspense
         fallback={<PokemonInfoFallback name={pokemonName} />}
       >
-        <div className="pokemon-info `${isPending? pokemon-loading:'' }`" >
+        <div className={`pokemon-info ${isPending ? 'pokemon-loading' : ''}`} >
           {pokemonResource ? (
             <PokemonErrorBoundary
               onReset={handleReset}
