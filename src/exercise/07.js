@@ -5,8 +5,8 @@ import * as React from 'react'
 import '../suspense-list/style-overrides.css'
 import * as cn from '../suspense-list/app.module.css'
 import Spinner from '../suspense-list/spinner'
-import {createResource} from '../utils'
-import {fetchUser, PokemonForm, PokemonErrorBoundary} from '../pokemon'
+import { createResource } from '../utils'
+import { fetchUser, PokemonForm, PokemonErrorBoundary } from '../pokemon'
 
 // 💰 this delay function just allows us to make a promise take longer to resolve
 // so we can easily play around with the loading time of our code.
@@ -32,7 +32,7 @@ const fallback = (
     <Spinner />
   </div>
 )
-const SUSPENSE_CONFIG = {timeoutMs: 4000}
+const SUSPENSE_CONFIG = { timeoutMs: 4000 }
 
 function App() {
   const [startTransition] = React.useTransition(SUSPENSE_CONFIG)
@@ -49,7 +49,7 @@ function App() {
       <div className="pokemon-info-app">
         <div
           className={`${cn.root} totally-centered`}
-          style={{height: '100vh'}}
+          style={{ height: '100vh' }}
         >
           <PokemonForm onSubmit={handleSubmit} />
         </div>
@@ -71,20 +71,22 @@ function App() {
           onReset={handleReset}
           resetKeys={[pokemonResource]}
         >
-          <React.Suspense fallback={fallback}>
-            <NavBar pokemonResource={pokemonResource} />
-          </React.Suspense>
-          <div className={cn.mainContentArea}>
+          <React.SuspenseList revealOrder="forwards" tail="hidden">
             <React.Suspense fallback={fallback}>
-              <LeftNav />
+              <NavBar pokemonResource={pokemonResource} />
             </React.Suspense>
-            <React.Suspense fallback={fallback}>
-              <MainContent pokemonResource={pokemonResource} />
-            </React.Suspense>
-            <React.Suspense fallback={fallback}>
-              <RightNav pokemonResource={pokemonResource} />
-            </React.Suspense>
-          </div>
+            <div className={cn.mainContentArea}>
+              <React.Suspense fallback={fallback}>
+                <LeftNav />
+              </React.Suspense>
+              <React.Suspense fallback={fallback}>
+                <MainContent pokemonResource={pokemonResource} />
+              </React.Suspense>
+              <React.Suspense fallback={fallback}>
+                <RightNav pokemonResource={pokemonResource} />
+              </React.Suspense>
+            </div>
+          </React.SuspenseList>
         </PokemonErrorBoundary>
       </div>
     </div>
