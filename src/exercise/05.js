@@ -9,7 +9,7 @@ import {
   PokemonDataView,
   PokemonErrorBoundary,
 } from '../pokemon'
-import {createResource} from '../utils'
+import { createResource } from '../utils'
 
 // ❗❗❗❗
 // 🦉 On this one, make sure that you UNCHECK the "Disable cache" checkbox
@@ -29,13 +29,31 @@ import {createResource} from '../utils'
 // 💰 Here's what rendering the <img /> should look like:
 // <img src={imgSrcResource.read()} {...props} />
 
-function PokemonInfo({pokemonResource}) {
+function preloadImage(src) {
+  return new Promise(resolve => {
+    const img = document.createElement('img')
+    img.src = src
+    img.onload = () => resolve(src)
+  })
+}
+
+const imgSrcResourceCache = {}
+function Img({ src, alt, props }) {
+  let imgSrcResource = imgSrcResourceCache[src]
+  if (!imgSrcResource) {
+    imgSrcResource = createResource(preloadImage(src))
+    imgSrcResourceCache[src] = imgSrcResource
+  }
+  return <img src={imgSrcResource.read()} alt={alt} {...props} />
+}
+
+function PokemonInfo({ pokemonResource }) {
   const pokemon = pokemonResource.read()
   return (
     <div>
       <div className="pokemon-info__img-wrapper">
         {/* 🐨 swap this img for your new Img component */}
-        <img src={pokemon.image} alt={pokemon.name} />
+        <Img src={pokemon.image} alt={pokemon.name} />
       </div>
       <PokemonDataView pokemon={pokemon} />
     </div>
@@ -104,8 +122,8 @@ function App() {
             </React.Suspense>
           </PokemonErrorBoundary>
         ) : (
-          'Submit a pokemon'
-        )}
+            'Submit a pokemon'
+          )}
       </div>
     </div>
   )
