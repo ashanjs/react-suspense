@@ -10,9 +10,9 @@ import {
   PokemonDataView,
   PokemonErrorBoundary,
 } from '../pokemon'
-import {createResource, preloadImage} from '../utils'
+import { createResource, preloadImage } from '../utils'
 
-function PokemonInfo({pokemonResource}) {
+function PokemonInfo({ pokemonResource }) {
   const pokemon = pokemonResource.data.read()
   return (
     <div>
@@ -45,18 +45,12 @@ function getPokemonResource(name) {
 function createPokemonResource(pokemonName) {
   const data = createResource(fetchPokemon(pokemonName))
   const image = createResource(preloadImage(getImageUrlForPokemon(pokemonName)))
-  return {data, image}
+  return { data, image }
 }
 
-function App() {
-  const [pokemonName, setPokemonName] = React.useState('')
-  // 🐨 move these two lines to a custom hook called usePokemonResource
+function usePokemonResource(pokemonName) {
   const [startTransition, isPending] = React.useTransition(SUSPENSE_CONFIG)
   const [pokemonResource, setPokemonResource] = React.useState(null)
-  // 🐨 call usePokemonResource with the pokemonName.
-  //    It should return both the pokemonResource and isPending
-
-  // 🐨 move this useEffect call your custom usePokemonResource hook
   React.useEffect(() => {
     if (!pokemonName) {
       setPokemonResource(null)
@@ -66,6 +60,15 @@ function App() {
       setPokemonResource(getPokemonResource(pokemonName))
     })
   }, [pokemonName, startTransition])
+  return [pokemonResource, isPending]
+
+
+}
+
+
+function App() {
+  const [pokemonName, setPokemonName] = React.useState('')
+  const [pokemonResource, isPending] = usePokemonResource(pokemonName)
 
   function handleSubmit(newPokemonName) {
     setPokemonName(newPokemonName)
@@ -92,8 +95,8 @@ function App() {
             </React.Suspense>
           </PokemonErrorBoundary>
         ) : (
-          'Submit a pokemon'
-        )}
+            'Submit a pokemon'
+          )}
       </div>
     </div>
   )
